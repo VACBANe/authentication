@@ -34,3 +34,12 @@
     }
   }
   
+
+  .loader-bg {
+    background-color: rgba(207, 207, 207, 0.356);
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }

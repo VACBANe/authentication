@@ -4,8 +4,8 @@ import { Route, useHistory } from "react-router-dom";
 
 import "./App.css";
 import Loader from "./components/Loader/Loader";
-import Login from "./components/Login";
-import Me from "./components/Me";
+import Login from "./components/Login/Login";
+import Me from "./components/Me/Me";
 
 function App() {
   const root = "123213123123123";
@@ -15,26 +15,22 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   let history = useHistory();
 
-
   useEffect(() => {
-    (function checkToken () {
-      let tempAccess = localStorage.getItem("authAccessToken");
-      let tempRefresh = localStorage.getItem("authRefreshToken");
-      if (tempAccess) {
-        if (isExpired(tempAccess)) {
-          console.log("Token expired");
-          tempRefresh && refreshToken(tempRefresh);
-          checkToken();
-        } else {
-          console.log("Token is valid");
-          history.push("/me");
-        }
-      } else {
-        console.log("Token is empty");
-        history.push("/login");
+    let tempAccess = localStorage.getItem("authAccessToken");
+    let tempRefresh = localStorage.getItem("authRefreshToken");
+    if (tempAccess) {
+      while (isExpired(tempAccess)) {
+        tempRefresh && refreshToken(tempRefresh);
       }
-    })()
-  }, [])
+      console.log("Token is valid");
+      history.push("/me");
+    } else {
+      console.log("Token is empty");
+      history.push("/login");
+    }
+    setIsLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const regFunc = () => {
     axios
@@ -51,6 +47,7 @@ function App() {
       });
   };
   const loginFunc = () => {
+    setIsLoading(true);
     axios
       .post(root + `login?email=${email}&password=${password}`)
       .then(({ data }) => {
@@ -61,6 +58,7 @@ function App() {
         } else {
           alert("Fail");
         }
+        setIsLoading(false);
       });
   };
 
@@ -99,7 +97,7 @@ function App() {
   const logoutFunc = () => {
     localStorage.removeItem("authAccessToken");
     localStorage.removeItem("authRefreshToken");
-    history.push('/login');
+    history.push("/login");
   };
 
   return (
@@ -114,14 +112,10 @@ function App() {
           loginFunc={loginFunc}
         />
       </Route>
-      <Route path="/me" component={Me} />
       <Route path="/me">
         <Me logoutFunc={logoutFunc} />
       </Route>
-      <button onClick={() => {}}>Refresh Token</button>
-      <button onClick={() => setIsLoading(false)}>Off</button>
-      <button onClick={() => setIsLoading(true)}>On</button>
-      {isLoading && <Loader />}
+      <div className="loader">{isLoading && <Loader />}</div>
     </div>
   );
 }
