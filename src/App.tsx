@@ -7,17 +7,16 @@ import Loader from "./components/Loader/Loader";
 import Login from "./components/Login/Login";
 import Me from "./components/Me/Me";
 
-function App() {
-  const root = "123213123123123";
-  // const root = "http://142.93.134.108:1111/";
-  const [email, setEmail] = useState("qwerty123@reg.com");
-  const [password, setPassword] = useState("qwerty123");
-  const [isLoading, setIsLoading] = useState(true);
+const App: React.FC = () => {
+  // const root = "123213123123123";
+  const root = "http://142.93.134.108:1111/";
+  const [email, setEmail] = useState<string>("qwerty123@reg.com");
+  const [password, setPassword] = useState<string>("qwerty123");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   let history = useHistory();
-
   useEffect(() => {
-    let tempAccess = localStorage.getItem("authAccessToken");
-    let tempRefresh = localStorage.getItem("authRefreshToken");
+    let tempAccess: string | null = localStorage.getItem("authAccessToken");
+    let tempRefresh: string | null = localStorage.getItem("authRefreshToken");
     if (tempAccess) {
       while (isExpired(tempAccess)) {
         tempRefresh && refreshToken(tempRefresh);
@@ -32,21 +31,19 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const regFunc = () => {
+  const regFunc: () => void = () => {
     axios
       .post(root + "sign_up", {
         email: email,
         password: password,
       })
       .then(({ data }) => {
-        if (data.message === "User was created successfully") {
-          loginFunc();
-        } else {
-          alert("Fail");
-        }
+        data.message === "User was created successfully"
+          ? loginFunc()
+          : alert("Fail");
       });
   };
-  const loginFunc = () => {
+  const loginFunc: () => void = () => {
     setIsLoading(true);
     axios
       .post(root + `login?email=${email}&password=${password}`)
@@ -62,7 +59,7 @@ function App() {
       });
   };
 
-  const refreshToken = (token: string) => {
+  const refreshToken: (t: string) => void = (token) => {
     console.log("Refreshing token");
     axios
       .post(root + "refresh", null, {
@@ -77,7 +74,7 @@ function App() {
       });
   };
 
-  const getBearer = (token: string) => {
+  const getBearer: (t: string) => string = (token) => {
     return `Bearer ${token}`;
   };
   const isExpired: (t: string) => boolean = (token) => {
@@ -94,7 +91,7 @@ function App() {
     }
     return false;
   };
-  const logoutFunc = () => {
+  const logoutFunc: () => void = () => {
     localStorage.removeItem("authAccessToken");
     localStorage.removeItem("authRefreshToken");
     history.push("/login");
@@ -118,5 +115,5 @@ function App() {
       <div className="loader">{isLoading && <Loader />}</div>
     </div>
   );
-}
+};
 export default App;
