@@ -1,15 +1,20 @@
-import "./Me.css";
+import React from 'react'
+import { useHistory } from 'react-router'
+import { clearToken } from '../../api/localStorageService'
+import './Me.css'
 
-interface Props {
-    logoutFunc: () => void;
-}
-const Me: React.FC<Props> = ({logoutFunc}) => {
+const Me: React.FC = () => {
+  const history = useHistory()
+  const logoutFunc: () => void = () => {
+    clearToken()
+    history.push('/login')
+  }
   return (
-    <div className={"me-container"}>
+    <div className={'me-container'}>
       <h1>Token is valid</h1>
       <button onClick={logoutFunc}>Logout</button>
     </div>
-  );
-};
+  )
+}
 
-export default Me;
+export default Me
